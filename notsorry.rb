@@ -31,17 +31,19 @@ csv_text = CSV.parse(File.read(PATH_TO_TWEETS_CSV).encode!("UTF-8", "iso-8859-1"
 # Create a new clean file of text that acts as the seed for your Markov chains
 File.open(PATH_TO_TWEETS_CLEAN, 'w') do |file|
   csv_text.reverse.each do |row|
+
     # Strip links and new lines
     tweet_text = row[5].gsub(/(?:f|ht)tps?:\/[^\s]+/, '').gsub(/\n/,' ')
  
- 	# Strip #sorrynotsorry
-    tweet_text = tweet_text.gsub(/#[Ss]orry[Nn]ot[Ss]orry/, '')
+ 	# Strip #sorrynotsorry in any capitalization
+    tweet_text = tweet_text.gsub(/#sorrynotsorry/i, '')
 
-    # Strip leading RT
+    # Strip leading RT's
     tweet_text = tweet_text.gsub(/^RT\s+/, '')
 
     # Save the text
     file.write("#{tweet_text}\n")
+    
   end
 end
   
