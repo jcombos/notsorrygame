@@ -1,13 +1,17 @@
 #!/usr/bin/ruby
+# encoding: utf-8
 
 # Make sure you have these gems installed
 require 'rubygems'
 require 'thread'
 require 'csv'
+require 'open-uri'
+
 require 'parseconfig'
 require 'twitter'
 require 'marky_markov'
 require 'htmlentities'
+require 'ensure/encoding'
 
 # Create a new Twitter account that you'd like to have your auto-tweets posted to
 # Go to dev.twitter.com, create a new application with Read+Write permissions
@@ -18,18 +22,25 @@ ACCESS_TOKEN_SECRET =  config['ACCESS_TOKEN_SECRET'] || abort('Can\'t post to Tw
 CONSUMER_KEY =  config['CONSUMER_KEY'] || abort('Can\'t post to Twitter without CONSUMER_KEY in config.txt')
 CONSUMER_SECRET =  config['CONSUMER_SECRET'] || abort('Can\'t post to Twitter without CONSUMER_SECRET in config.txt')
 
-# These can be overridden in config.txt but have defaults
+# These can be overridden in config.txt but have defaults; be sure to use double-quotes if PATH_TO_TWEETS_CSV is a URI!
 PATH_TO_TWEETS_CSV   = config['PATH_TO_TWEETS_CSV'] || 'tweets.csv'
 PATH_TO_TWEETS_CLEAN = config['PATH_TO_TWEETS_CLEAN'] || 'markov_dict.txt'
 
 ### -----------------------------------------------------------------------------------------------------
 
 # We need a source of tweets in PATH_TO_TWEETS_CSV
-# Go to Twitter.com -> Settings -> Download Archive. 
-# Or any other CSV file with the tweets in the sixth column will work.
-csv_text = CSV.parse(File.read(PATH_TO_TWEETS_CSV).encode!("UTF-8", invalid: :replace))
+# Go to Twitter.com -> Settings -> Download Archive to get a CSV file
+# Any other CSV file with the tweets in the sixth column will also work.
+# You can also supply a URI, eg "http://somedomain/somefile.csv"
+file_contents = open(PATH_TO_TWEETS_CSV, "Accept-Charset" => "UTF-8") { |f| f.read }
 
-# We'll want to re-encode HTML entities
+# If it's retrieved from a URI, Ruby somehow thinks it's encoded as ASCII-8BIT. It shouldn't...
+file_contents = file_contents.ensure_encoding('UTF-8', :external_encoding => :sniff, :invalid_characters => :transcode)
+
+# Be extra paranoid about encoding...
+csv_text = CSV.parse(file_contents.encode!("UTF-8", {invalid: :replace}))
+
+# We'll want to re-encode HTML entities, otherwise they look dumb
 coder = HTMLEntities.new
 
 # Create a new clean file of text that acts as the seed for your Markov chains
