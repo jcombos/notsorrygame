@@ -7,6 +7,7 @@ require 'csv'
 require 'parseconfig'
 require 'twitter'
 require 'marky_markov'
+require 'htmlentities'
 
 # Create a new Twitter account that you'd like to have your auto-tweets posted to
 # Go to dev.twitter.com, create a new application with Read+Write permissions
@@ -26,7 +27,10 @@ PATH_TO_TWEETS_CLEAN = config['PATH_TO_TWEETS_CLEAN'] || 'markov_dict.txt'
 # We need a source of tweets in PATH_TO_TWEETS_CSV
 # Go to Twitter.com -> Settings -> Download Archive. 
 # Or any other CSV file with the tweets in the sixth column will work.
-csv_text = CSV.parse(File.read(PATH_TO_TWEETS_CSV).encode!("UTF-8", "iso-8859-1", invalid: :replace))
+csv_text = CSV.parse(File.read(PATH_TO_TWEETS_CSV).encode!("UTF-8", invalid: :replace))
+
+# We'll want to re-encode HTML entities
+coder = HTMLEntities.new
 
 # Create a new clean file of text that acts as the seed for your Markov chains
 File.open(PATH_TO_TWEETS_CLEAN, 'w') do |file|
@@ -41,9 +45,12 @@ File.open(PATH_TO_TWEETS_CLEAN, 'w') do |file|
     # Strip leading RT's
     tweet_text = tweet_text.gsub(/^RT\s+/, '')
 
+    # Re-encode any HTML entities
+    tweet_text = coder.decode(tweet_text)
+
     # Save the text
     file.write("#{tweet_text}\n")
-    
+
   end
 end
   
