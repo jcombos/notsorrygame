@@ -1,0 +1,4 @@
+CONSUMER_KEY         = 'your_twitterapp_consumer_key'
+CONSUMER_SECRET      = 'your_twitterapp_consumer_secret'
+ACCESS_TOKEN         = 'your_twitteracct_access_token'
+ACCESS_TOKEN_SECRET  = 'your_twitteracct_access_token_secret'
