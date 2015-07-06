@@ -23,8 +23,9 @@ PATH_TO_TWEETS_CLEAN = config['PATH_TO_TWEETS_CLEAN'] || 'markov_dict.txt'
 
 ### -----------------------------------------------------------------------------------------------------
 
+# We need a source of tweets in PATH_TO_TWEETS_CSV
 # Go to Twitter.com -> Settings -> Download Archive. 
-# This tweets.csv file is in the top directory. Put it in the same directory as this script.
+# Or any other CSV file with the tweets in the sixth column will work.
 csv_text = CSV.parse(File.read(PATH_TO_TWEETS_CSV).encode!("UTF-8", "iso-8859-1", invalid: :replace))
 
 # Create a new clean file of text that acts as the seed for your Markov chains
@@ -45,10 +46,9 @@ File.open(PATH_TO_TWEETS_CLEAN, 'w') do |file|
 end
   
 # Run when you want to generate a new Markov tweet
-markov = MarkyMarkov::Dictionary.new('dictionary') # Saves/opens dictionary.mmd
+markov = MarkyMarkov::TemporaryDictionary.new
 markov.parse_file PATH_TO_TWEETS_CLEAN
 tweet_text = markov.generate_n_sentences(2).split(/\#\</).first.chomp.chop
-markov.save_dictionary!
     
 # Connect to your Twitter account
 # Twitter.configure do |config|
