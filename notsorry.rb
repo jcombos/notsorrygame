@@ -11,15 +11,15 @@ require 'marky_markov'
 # Create a new Twitter account that you'd like to have your auto-tweets posted to
 # Go to dev.twitter.com, create a new application with Read+Write permissions
 # Create an access token + secret for the account and copy that and the consumer key and secrets into config.txt
-PATH_TO_TWEETS_CSV   = 'tweets.csv'
-PATH_TO_TWEETS_CLEAN = 'markov_dict.txt'
-
 config = ParseConfig.new('config.txt')
 ACCESS_TOKEN =  config['ACCESS_TOKEN'] || abort('Can\'t post to Twitter without ACCESS_TOKEN in config.txt')
 ACCESS_TOKEN_SECRET =  config['ACCESS_TOKEN_SECRET'] || abort('Can\'t post to Twitter without ACCESS_TOKEN_SECRET in config.txt')
 CONSUMER_KEY =  config['CONSUMER_KEY'] || abort('Can\'t post to Twitter without CONSUMER_KEY in config.txt')
 CONSUMER_SECRET =  config['CONSUMER_SECRET'] || abort('Can\'t post to Twitter without CONSUMER_SECRET in config.txt')
 
+# These can be overridden in config.txt but have defaults
+PATH_TO_TWEETS_CSV   = config['PATH_TO_TWEETS_CSV'] || 'tweets.csv'
+PATH_TO_TWEETS_CLEAN = config['PATH_TO_TWEETS_CLEAN'] || 'markov_dict.txt'
 
 ### -----------------------------------------------------------------------------------------------------
 
